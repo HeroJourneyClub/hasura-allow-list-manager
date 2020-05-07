@@ -1,0 +1,79 @@
+{
+  "name": "hasura-allow-operations-in",
+  "version": "0.1.7",
+  "description": "Populate the Hasura allow-list from found GraphQL operations in a path",
+  "main": "dist/index.js",
+  "bin": {
+    "hasura-allow-operations-in": "dist/cli.js"
+  },
+  "scripts": {
+    "preglobal:add": "yarn build",
+    "build": "tsc -p .",
+    "dev": "ts-node-dev --no-notify --respawn --transpileOnly  src/cli.ts",
+    "lint": "eslint 'src/**/*.ts'",
+    "prepare": "yarn build",
+    "postpack": "shx rm -rf dist",
+    "test": "jest ./src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhyslbw/hasura-allow-operations-in.git"
+  },
+  "keywords": [
+    "Hasura",
+    "GraphQL"
+  ],
+  "maintainers": [
+    "Rhys Bartels-Waller <rhyslbw@gmail.com>"
+  ],
+  "engines": {
+    "node": "^10 || ^12"
+  },
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/rhyslbw/hasura-allow-operations-in/issues"
+  },
+  "homepage": "https://github.com/rhyslbw/hasura-allow-operations-in#README.md",
+  "dependencies": {
+    "@graphql-toolkit/core": "^0.10.6",
+    "@graphql-toolkit/graphql-file-loader": "^0.10.6",
+    "axios": "^0.19.2",
+    "delay": "^4.3.0",
+    "graphql": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.2.1",
+    "@types/node": "^12.6.8",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
+    "docker-compose": "^0.23.4",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-watch": "^6.0.1",
+    "jest": "^26.0.0",
+    "prettier": "^2.0.5",
+    "shx": "^0.3.2",
+    "ts-jest": "^25.5.0",
+    "ts-node-dev": "^1.0.0-pre.40",
+    "typescript": "3.5.3"
+  },
+  "files": [
+    "dist/*",
+    "!dist/__test__",
+    "!dist/**/*.test.*",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "arrowParens": "avoid"
+  }
+}
