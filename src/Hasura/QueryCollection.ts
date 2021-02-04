@@ -20,3 +20,25 @@ function fromToolkitSource(source: Source): QueryCollection {
 export function createQueryCollection(sources: Source[]): QueryCollection[] {
   return sources.map(source => fromToolkitSource(source));
 }
+
+export function toMap(
+  queries: QueryCollection[]
+): Map<QueryCollection['name'], QueryCollection['query']> {
+  return queries.reduce((acc, query) => {
+    acc.set(query.name, query.query);
+    return acc;
+  }, new Map());
+}
+
+export function getChangedQueries(
+  oldQueries: QueryCollection[],
+  newQueries: QueryCollection[]
+) {
+  const oldMap = toMap(oldQueries);
+
+  return newQueries.filter(({ query, name }) => {
+    const oldQuery = oldMap.get(name);
+
+    return oldQuery !== query;
+  });
+}
