@@ -4,8 +4,8 @@ import { loadDocuments } from '@graphql-toolkit/core';
 import { GraphQLFileLoader } from '@graphql-toolkit/graphql-file-loader';
 import {
   init,
-  fromToolkitSource,
-  QueryCollection,
+  createQueryCollection,
+  createOperationDefinitionNodes,
 } from './Hasura/schema_metadata/QueryCollection';
 
 export type RunReport = {
@@ -30,23 +30,19 @@ export async function run(
   sourcePaths: string | string[],
   allowIntrospection?: boolean
 ): Promise<RunReport> {
-  const definitionNodes: OperationDefinitionNode[] = [];
   const sources = await loadDocuments(sourcePaths, {
     loaders: [new GraphQLFileLoader()],
   });
-  sources.forEach(source => {
-    source.document.definitions.forEach(def =>
-      definitionNodes.push(def as OperationDefinitionNode)
-    );
-  });
-  const collectionItem: QueryCollection[] = sources.map(source =>
-    fromToolkitSource(source)
-  );
+
+  const collectionItem = createQueryCollection(sources);
+  const definitionNodes = createOperationDefinitionNodes(sources);
+
   if (allowIntrospection)
     collectionItem.push({
       name: 'IntrospectionQuery',
       query: getIntrospectionQuery(),
     });
+
   const report: RunReport = {
     addedCount: 0,
     existingCount: 0,
@@ -54,7 +50,9 @@ export async function run(
     introspectionAllowed: allowIntrospection,
     operationDefinitionsFound: definitionNodes,
   };
+
   const api = init(hasuraUri, adminSecret);
+
   try {
     await api.createQueryCollection(collectionItem);
     report.collectionCreated = true;
@@ -63,6 +61,7 @@ export async function run(
     throwIfUnexpected(error);
     // The collection exists, but the contents are unknown
     // Ensure each query is in the allow list
+    console.log({ collectionItem });
     for (const item of collectionItem) {
       try {
         await api.addQueryToCollection(item);

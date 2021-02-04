@@ -6,7 +6,7 @@ export interface QueryCollection {
   query: string;
 }
 
-export function fromToolkitSource(source: Source): QueryCollection {
+function fromToolkitSource(source: Source): QueryCollection {
   const names = source.document.definitions.reduce(
     (prev, curr: TypeDefinitionNode) => prev.concat(curr.name.value),
     [] as string[]
@@ -15,4 +15,8 @@ export function fromToolkitSource(source: Source): QueryCollection {
     name: names.join(' '),
     query: source.rawSDL,
   };
+}
+
+export function createQueryCollection(sources: Source[]): QueryCollection[] {
+  return sources.map(source => fromToolkitSource(source));
 }

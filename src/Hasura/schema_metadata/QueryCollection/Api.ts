@@ -8,6 +8,9 @@ export interface Api {
   addQueryToCollection: (
     collectionQuery: QueryCollection
   ) => Promise<AxiosResponse>;
+  addCollectionToAllowList: () => Promise<AxiosResponse>;
+  dropCollectionFromAllowList: () => Promise<AxiosResponse>;
+  exportMetadata: () => Promise<AxiosResponse>;
 }
 
 export function init(hasuraUri: string, adminSecret: string): Api {
@@ -16,8 +19,8 @@ export function init(hasuraUri: string, adminSecret: string): Api {
   const config = {
     headers: {
       'X-Hasura-Role': 'admin',
-      'x-hasura-admin-secret': adminSecret
-    }
+      'x-hasura-admin-secret': adminSecret,
+    },
   };
   return {
     addQueryToCollection(
@@ -50,6 +53,31 @@ export function init(hasuraUri: string, adminSecret: string): Api {
         },
         config
       );
+    },
+    addCollectionToAllowList(): Promise<AxiosResponse> {
+      return axios.post(uri, {
+        type: 'add_collection_to_allowlist',
+        args: {
+          collection: collectionName,
+        },
+        config,
+      });
+    },
+    dropCollectionFromAllowList(): Promise<AxiosResponse> {
+      return axios.post(uri, {
+        type: 'drop_collection_to_allowlist',
+        args: {
+          collection: collectionName,
+        },
+        config,
+      });
+    },
+    exportMetadata(): Promise<AxiosResponse> {
+      return axios.post(uri, {
+        type: 'export_metadata',
+        args: {},
+        config,
+      });
     },
   };
 }
