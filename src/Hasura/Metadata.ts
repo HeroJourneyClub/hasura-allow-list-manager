@@ -1,6 +1,6 @@
 import { QueryCollection } from './QueryCollection';
 
-type Metadata = {
+export type Metadata = {
   query_collections: [
     {
       name: string;

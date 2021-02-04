@@ -1,11 +1,14 @@
 import axios, { AxiosResponse } from 'axios';
-import { QueryCollection } from './index';
+import { QueryCollection } from './QueryCollection';
 
 export interface Api {
   createQueryCollection: (
     collectionQueries: QueryCollection[]
   ) => Promise<AxiosResponse>;
   addQueryToCollection: (
+    collectionQuery: QueryCollection
+  ) => Promise<AxiosResponse>;
+  dropQueryFromCollection: (
     collectionQuery: QueryCollection
   ) => Promise<AxiosResponse>;
   addCollectionToAllowList: () => Promise<AxiosResponse>;
@@ -22,6 +25,7 @@ export function init(hasuraUri: string, adminSecret: string): Api {
       'x-hasura-admin-secret': adminSecret,
     },
   };
+
   return {
     addQueryToCollection(
       collectionQuery: QueryCollection
@@ -73,11 +77,29 @@ export function init(hasuraUri: string, adminSecret: string): Api {
       });
     },
     exportMetadata(): Promise<AxiosResponse> {
-      return axios.post(uri, {
-        type: 'export_metadata',
-        args: {},
-        config,
-      });
+      return axios.post(
+        uri,
+        {
+          type: 'export_metadata',
+          args: {},
+        },
+        config
+      );
+    },
+    dropQueryFromCollection(
+      collectionQuery: QueryCollection
+    ): Promise<AxiosResponse> {
+      return axios.post(
+        uri,
+        {
+          type: 'drop_query_from_collection',
+          args: {
+            collection_name: collectionName,
+            query_name: collectionQuery.name,
+          },
+        },
+        config
+      );
     },
   };
 }
