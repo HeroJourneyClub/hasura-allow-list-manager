@@ -1,6 +1,6 @@
 {
   "name": "@taller/hasura-allowed-queries",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Populate the Hasura allow-list from found GraphQL operations in a path",
   "main": "dist/index.js",
   "bin": {
