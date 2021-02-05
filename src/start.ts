@@ -10,7 +10,7 @@ const hasuraUri = options.host;
 const adminSecret = options.adminSecret;
 const sourcePath = options.path;
 const forceReplace = options.forceReplace;
-const allowIntrospection = options.allowInstrospection;
+const allowIntrospection = !!options.allowInstrospection;
 
 if (sourcePath === undefined) {
   throw new Error('Source path must be passed as first argument');
@@ -53,7 +53,9 @@ run(hasuraUri, adminSecret, sourcePath, allowIntrospection)
         );
       }
 
-      if (changed === 0) return;
+      if (changed === 0) {
+        process.exit(1);
+      }
 
       if (forceReplace) {
         console.log('Forcing queries replacement...');
@@ -62,7 +64,7 @@ run(hasuraUri, adminSecret, sourcePath, allowIntrospection)
       }
 
       question(
-        'Do you want to continue? This will replace the changed queries on Hasura!, y/n'
+        'Do you want to continue? This will replace the changed queries on Hasura!, y/n -> '
       ).then((answer: string) => {
         if (answer.toLowerCase() === 'y') {
           replaceQueries(changedQueries);

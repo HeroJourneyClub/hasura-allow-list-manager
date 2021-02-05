@@ -7,6 +7,7 @@ const readline = createInterface({
 
 readline.on('close', function () {
   console.log('\nClosing...');
+  process.exit(1);
 });
 
 export function question(message: string) {
