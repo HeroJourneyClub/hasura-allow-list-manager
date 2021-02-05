@@ -7,14 +7,14 @@ const readline = createInterface({
 
 readline.on('close', function () {
   console.log('\nClosing...');
-  process.exit(1);
+  process.exit(0);
 });
 
 export function question(message: string) {
   return new Promise(resolve => {
     readline.question(message, answer => {
       resolve(answer);
-      readline.close();
+      readline.resume();
     });
   });
 }

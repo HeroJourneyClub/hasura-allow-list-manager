@@ -27,9 +27,11 @@ function replaceQueries(queries: QueryCollection[]) {
   Promise.all(queries.map(service.replaceQueryFromCollection))
     .then(() => {
       console.log('Queries updated!');
+      process.exit(0);
     })
     .catch(e => {
       console.log('Error on update queries!', e);
+      process.exit(1);
     });
 }
 
@@ -54,7 +56,8 @@ run(hasuraUri, adminSecret, sourcePath, allowIntrospection)
       }
 
       if (changed === 0) {
-        process.exit(1);
+        process.exit(0);
+        return;
       }
 
       if (forceReplace) {
@@ -64,10 +67,12 @@ run(hasuraUri, adminSecret, sourcePath, allowIntrospection)
       }
 
       question(
-        'Do you want to continue? This will replace the changed queries on Hasura!, y/n -> '
+        'Do you want to continue? This will replace the changed queries on Hasura! y/n -> '
       ).then((answer: string) => {
-        if (answer.toLowerCase() === 'y') {
+        if (answer.toLowerCase().trim() === 'y') {
           replaceQueries(changedQueries);
+        } else {
+          process.exit(0);
         }
       });
     }
