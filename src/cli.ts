@@ -12,7 +12,7 @@ program
   )
   .option('-i, --allow-introspection', 'Send Introspection query');
 
-export function getParams(args) {
+export function getParams(args: string[]) {
   program.parse(args);
 
   return program.opts();
