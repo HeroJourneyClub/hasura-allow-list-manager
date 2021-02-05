@@ -9,7 +9,7 @@ Hasura only accepts a collection query named "allowed-queries", and its [Query C
 
 ## How it works
 
-The local queries, mutations, and subscriptions defined in `.graphql` or `.gql` files will be compared with the remote Hasura server.  The news definitions will be sent to Hasura and the existing ones will be compared and the difference between them will be shown. The replacement will be done by removing the remote query and re-adding the local changed query.
+The local queries, mutations, and subscriptions defined in `.graphql` or `.gql` files will be compared with the remote Hasura server.  The new definitions will be sent to Hasura and the existing ones will be compared and the difference between them will be shown. The replacement will be done by removing the remote query and re-adding the local changed query.
 
 ## Install
 
