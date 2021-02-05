@@ -9,8 +9,7 @@
   "scripts": {
     "preglobal:add": "yarn build",
     "build": "tsc -p .",
-    "dev": "ts-node-dev --no-notify --respawn --transpileOnly  src/cli.ts",
-    "run": "ts-node-dev --no-notify --transpileOnly  src/cli.ts",
+    "dev": "ts-node-dev --no-notify --transpileOnly  src/start.ts",
     "lint": "eslint 'src/**/*.ts'",
     "prepare": "yarn build",
     "postpack": "shx rm -rf dist",
@@ -20,13 +19,8 @@
     "type": "git",
     "url": "git+https://github.com/rhyslbw/hasura-allow-operations-in.git"
   },
-  "keywords": [
-    "Hasura",
-    "GraphQL"
-  ],
-  "maintainers": [
-    "Rhys Bartels-Waller <rhyslbw@gmail.com>"
-  ],
+  "keywords": ["Hasura", "GraphQL"],
+  "maintainers": ["Rhys Bartels-Waller <rhyslbw@gmail.com>"],
   "engines": {
     "node": "^10 || ^12"
   },
@@ -40,6 +34,7 @@
     "@graphql-toolkit/graphql-file-loader": "^0.10.6",
     "axios": "^0.19.2",
     "chalk": "^4.1.0",
+    "commander": "^7.0.0",
     "diff": "^5.0.0",
     "graphql": "^14.0.0"
   },

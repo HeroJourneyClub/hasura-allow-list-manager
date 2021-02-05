@@ -1,35 +1,19 @@
-#!/usr/bin/env node
-import { run } from './run';
+import { Command } from 'commander';
 
-const hasuraUri = process.argv[2];
-const adminSecret = process.argv[3]
-const sourcePath = process.argv[4];
-const allowIntrospection = process.argv[5] === 'true';
+const program = new Command();
 
-if (sourcePath === undefined) {
-  throw new Error('Source path must be passed as first argument');
-}
-
-if (hasuraUri === undefined) {
-  throw new Error('Hasura URI must be passed as the second argument');
-}
-
-run(hasuraUri, adminSecret, sourcePath, allowIntrospection)
-  .then(
-    ({
-      introspectionAllowed,
-      operationDefinitionsFound,
-      addedCount,
-      existingCount,
-    }) => {
-      console.log(
-        `Introspection allowed: ${introspectionAllowed} | Found: ${operationDefinitionsFound.length} | Added: ${addedCount} | Existing: ${existingCount}`
-      );
-      if (process.env.DEBUG) {
-        operationDefinitionsFound.forEach(def =>
-          console.log(`${def.operation}: ${def.name.value}`)
-        );
-      }
-    }
+program
+  .option('-h, --host <host>', 'Hasura URI host')
+  .option('-s, --admin-secret <key>', 'Hasura adming secret key')
+  .option('-p, --path <path>', 'Source path with gql or graphql files')
+  .option(
+    '-f, --force-replace',
+    'Replace change queries, not asking for continue'
   )
-  .catch(error => console.error(error));
+  .option('-i, --allow-introspection', 'Send Introspection query');
+
+export function getParams(args) {
+  program.parse(args);
+
+  return program.opts();
+}
