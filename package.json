@@ -4,7 +4,7 @@
   "description": "Populate the Hasura allow-list from found GraphQL operations in a path",
   "main": "dist/index.js",
   "bin": {
-    "hasura-allowed-queries": "dist/cli.js"
+    "hasura-allowed-queries": "dist/start.js"
   },
   "scripts": {
     "preglobal:add": "yarn build",
@@ -19,10 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/TallerWebSolutions/hasura-allowed-queries.git"
   },
-  "keywords": [
-    "Hasura",
-    "GraphQL"
-  ],
+  "keywords": ["Hasura", "GraphQL"],
   "maintainers": [
     "Taller team <dev@taller.net.br>",
     "Rhys Bartels-Waller <rhyslbw@gmail.com>"
