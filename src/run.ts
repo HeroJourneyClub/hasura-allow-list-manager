@@ -4,16 +4,22 @@ import { loadDocuments } from '@graphql-toolkit/core';
 import { GraphQLFileLoader } from '@graphql-toolkit/graphql-file-loader';
 import {
   init,
+  hasuraService,
   createQueryCollection,
   createOperationDefinitionNodes,
-} from './Hasura/schema_metadata/QueryCollection';
+  QueryCollection,
+  getChangedQueries,
+} from './hasura';
+import { printQueryDiff } from './diff';
 
 export type RunReport = {
   addedCount: number;
+  changed: number;
   collectionCreated: boolean;
   existingCount: number;
   introspectionAllowed: boolean;
   operationDefinitionsFound: OperationDefinitionNode[];
+  changedQueries: QueryCollection[];
 };
 
 function throwIfUnexpected(error: AxiosError): void {
@@ -46,12 +52,15 @@ export async function run(
   const report: RunReport = {
     addedCount: 0,
     existingCount: 0,
+    changed: 0,
     collectionCreated: false,
     introspectionAllowed: allowIntrospection,
     operationDefinitionsFound: definitionNodes,
+    changedQueries: [],
   };
 
   const api = init(hasuraUri, adminSecret);
+  const service = hasuraService(api);
 
   try {
     await api.createQueryCollection(collectionItem);
@@ -61,7 +70,8 @@ export async function run(
     throwIfUnexpected(error);
     // The collection exists, but the contents are unknown
     // Ensure each query is in the allow list
-    console.log({ collectionItem });
+    let existingQueries: QueryCollection[] = [];
+
     for (const item of collectionItem) {
       try {
         await api.addQueryToCollection(item);
@@ -69,8 +79,20 @@ export async function run(
       } catch (error) {
         throwIfUnexpected(error);
         report.existingCount++;
+        existingQueries = [...existingQueries, item];
       }
     }
+
+    const remoteQueries = await service.getRemoteAllowedQueryCollection();
+    const changedQueries = await getChangedQueries(
+      remoteQueries,
+      existingQueries
+    );
+
+    printQueryDiff(remoteQueries, changedQueries);
+
+    report.changed = changedQueries.length;
+    report.changedQueries = changedQueries;
   }
   return report;
 }

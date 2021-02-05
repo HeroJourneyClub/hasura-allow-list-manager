@@ -5,13 +5,13 @@ import * as delay from 'delay';
 import { run } from '../';
 
 const adminSecret = 'my-admin-secret';
-const hasuraUri = process.env.HASURA_URI || 'http://localhost:8090'
+const hasuraUri = process.env.HASURA_URI || 'http://localhost:8090';
 const sourcePathOne = path.resolve(__dirname, 'operations/1/**/*.graphql');
 const sourcePathTwo = path.resolve(__dirname, 'operations/2/**/*.graphql');
 const composeOptions: IDockerComposeOptions = {
   cwd: path.join(__dirname),
   composeOptions: ['-p hasura-allow-operations-in'],
-  log: true
+  log: true,
 };
 
 describe('e2e', () => {
@@ -25,7 +25,7 @@ describe('e2e', () => {
     beforeEach(async () => {
       await compose.upAll({
         ...composeOptions,
-        commandOptions: ['--force-recreate']
+        commandOptions: ['--force-recreate'],
       });
       await delay(3000);
     });
@@ -49,7 +49,7 @@ describe('e2e', () => {
     beforeEach(async () => {
       await compose.upAll({
         ...composeOptions,
-        commandOptions: ['--force-recreate']
+        commandOptions: ['--force-recreate'],
       });
       await delay(2000);
       const report = await run(hasuraUri, adminSecret, sourcePathOne);
