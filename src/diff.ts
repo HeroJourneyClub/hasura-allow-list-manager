@@ -1,6 +1,6 @@
-import 'colors';
 import { diffLines } from 'diff';
 import { QueryCollection, toMap } from './hasura';
+import { logger } from './logger';
 
 function showDiff(previouString: string, currentString: string) {
   const diff = diffLines(previouString, currentString);
@@ -10,7 +10,7 @@ function showDiff(previouString: string, currentString: string) {
     // grey for common parts
     const color = part.added ? 'green' : part.removed ? 'red' : 'white';
     const prefix = part.added ? '+' : part.removed ? '-' : '';
-    console.log(`${prefix}${part.value[color]}`);
+    logger(`${prefix}${part.value}`, color);
   });
 }
 
@@ -27,7 +27,7 @@ export function printQueryDiff(
   changedQueries.forEach(({ query, name }) => {
     const remoteQuery = remoteMapQueries.get(name);
 
-    console.log(`\n\n${name} has changed!! \n`);
+    logger(`\n\n${name} has changed!! \n`, 'blue');
     showDiff(remoteQuery, query);
   });
 }

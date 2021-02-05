@@ -20,8 +20,13 @@
     "type": "git",
     "url": "git+https://github.com/rhyslbw/hasura-allow-operations-in.git"
   },
-  "keywords": ["Hasura", "GraphQL"],
-  "maintainers": ["Rhys Bartels-Waller <rhyslbw@gmail.com>"],
+  "keywords": [
+    "Hasura",
+    "GraphQL"
+  ],
+  "maintainers": [
+    "Rhys Bartels-Waller <rhyslbw@gmail.com>"
+  ],
   "engines": {
     "node": "^10 || ^12"
   },
@@ -34,7 +39,7 @@
     "@graphql-toolkit/core": "^0.10.6",
     "@graphql-toolkit/graphql-file-loader": "^0.10.6",
     "axios": "^0.19.2",
-    "colors": "^1.4.0",
+    "chalk": "^4.1.0",
     "diff": "^5.0.0",
     "graphql": "^14.0.0"
   },
@@ -44,8 +49,8 @@
     "@types/node": "^12.6.8",
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
-    "docker-compose": "^0.23.4",
     "delay": "^4.3.0",
+    "docker-compose": "^0.23.4",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.20.1",
