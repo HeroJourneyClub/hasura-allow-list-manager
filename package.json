@@ -1,10 +1,10 @@
 {
-  "name": "hasura-allow-operations-in",
-  "version": "0.1.8",
+  "name": "hasura-allowed-queries",
+  "version": "0.1.0",
   "description": "Populate the Hasura allow-list from found GraphQL operations in a path",
   "main": "dist/index.js",
   "bin": {
-    "hasura-allow-operations-in": "dist/cli.js"
+    "hhasura-allowed-queries": "dist/cli.js"
   },
   "scripts": {
     "preglobal:add": "yarn build",
@@ -17,18 +17,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rhyslbw/hasura-allow-operations-in.git"
+    "url": "git+https://github.com/TallerWebSolutions/hasura-allowed-queries.git"
   },
-  "keywords": ["Hasura", "GraphQL"],
-  "maintainers": ["Rhys Bartels-Waller <rhyslbw@gmail.com>"],
+  "keywords": [
+    "Hasura",
+    "GraphQL"
+  ],
+  "maintainers": [
+    "Taller team <dev@taller.net.br>",
+    "Rhys Bartels-Waller <rhyslbw@gmail.com>"
+  ],
   "engines": {
     "node": "^10 || ^12"
   },
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/rhyslbw/hasura-allow-operations-in/issues"
+    "url": "https://github.com/TallerWebSolutions/hasura-allowed-queries/issues"
   },
-  "homepage": "https://github.com/rhyslbw/hasura-allow-operations-in#README.md",
+  "homepage": "https://github.com/TallerWebSolutions/hasura-allowed-queries#README.md",
   "dependencies": {
     "@graphql-toolkit/core": "^0.10.6",
     "@graphql-toolkit/graphql-file-loader": "^0.10.6",
