@@ -7,11 +7,11 @@
     "hasura-allowed-queries": "dist/start.js"
   },
   "scripts": {
-    "preglobal:add": "yarn build",
+    "preglobal:add": "npm run build",
     "build": "tsc -p .",
     "dev": "ts-node-dev --no-notify --transpileOnly  src/start.ts",
     "lint": "eslint 'src/**/*.ts'",
-    "prepare": "yarn build",
+    "prepare": "npm run build",
     "postpack": "shx rm -rf dist",
     "test": "jest ./src"
   },
@@ -19,7 +19,10 @@
     "type": "git",
     "url": "git+https://github.com/TallerWebSolutions/hasura-allowed-queries.git"
   },
-  "keywords": ["Hasura", "GraphQL"],
+  "keywords": [
+    "Hasura",
+    "GraphQL"
+  ],
   "maintainers": [
     "Taller team <dev@taller.net.br>",
     "Rhys Bartels-Waller <rhyslbw@gmail.com>"
