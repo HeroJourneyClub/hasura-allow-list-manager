@@ -1,6 +1,6 @@
 {
   "name": "@taller/hasura-allowed-queries",
-  "version": "0.1.6",
+  "version": "0.1.5",
   "description": "Populate the Hasura allow-list from found GraphQL operations in a path",
   "main": "dist/index.js",
   "bin": {
@@ -9,7 +9,7 @@
   "scripts": {
     "preglobal:add": "npm run build",
     "build": "tsc -p .",
-    "dev": "ts-node-dev --no-notify --transpileOnly  src/start.ts",
+    "dev": "ts-node-dev --no-notify --transpile-only src/start.ts",
     "lint": "eslint 'src/**/*.ts'",
     "prepare": "npm run build",
     "postpack": "shx rm -rf dist",

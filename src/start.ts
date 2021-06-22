@@ -6,11 +6,13 @@ import { getParams } from './cli';
 
 const options = getParams(process.argv);
 
+
 const hasuraUri = options.host;
 const adminSecret = options.adminSecret;
 const sourcePath = options.path;
 const forceReplace = options.forceReplace;
 const allowIntrospection = !!options.allowInstrospection;
+const resetAllowList = !!options.reset
 
 if (sourcePath === undefined) {
   throw new Error('Source path must be passed as first argument');
@@ -35,7 +37,7 @@ function replaceQueries(queries: QueryCollection[]) {
     });
 }
 
-run(hasuraUri, adminSecret, sourcePath, allowIntrospection)
+run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList)
   .then(
     ({
       introspectionAllowed,

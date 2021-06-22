@@ -37,6 +37,7 @@ hasura-allowed-queries [options]
 - `-p | --path <path>` Source path with gql or graphql files
 - `-f | --force-replace` Replace change queries, not prompt and asking for continue
 - `-i | --allow-instrospection` Send the Introspection query with your queries
+- `-r | --reset` Delete all allow lists before running insert
 
 ## Development
 
@@ -51,7 +52,7 @@ npm i --dev @taller/hasura-allowed-queries
 2. To run the cli:
 
 ```
-npm run dev -h http://localhost:8080 -s my-admin-secret -p '**/*.graphql'
+npm run dev -- -h http://localhost:8080 -s my-admin-secret -p '**/*.graphql'
 ```
 
 ## Contributing

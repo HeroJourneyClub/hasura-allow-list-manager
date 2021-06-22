@@ -22,10 +22,11 @@ export type RunReport = {
   changedQueries: QueryCollection[];
 };
 
-function throwIfUnexpected(error: AxiosError): void {
+function throwIfUnexpected(error: AxiosError, acceptable_errors: string[]): void {
   if (
     error.response === undefined ||
-    error.response.data.code !== 'already-exists'
+    error.response.data.code !== 'already-exists' && 'already-exists' in acceptable_errors ||
+    error.response.data.code !== 'not-exists' && "not-exists" in acceptable_errors
   )
     throw error;
 }
@@ -34,7 +35,8 @@ export async function run(
   hasuraUri: string,
   adminSecret: string,
   sourcePaths: string | string[],
-  allowIntrospection?: boolean
+  allowIntrospection?: boolean,
+  resetAllowList?: boolean,
 ): Promise<RunReport> {
   const sources = await loadDocuments(sourcePaths, {
     loaders: [new GraphQLFileLoader()],
@@ -62,12 +64,20 @@ export async function run(
   const api = init(hasuraUri, adminSecret);
   const service = hasuraService(api);
 
+  if (resetAllowList) {
+    try {
+      await api.dropQueryCollection()
+    } catch (error) {
+      throwIfUnexpected(error, ['not-exists'])
+    }
+  }
+
   try {
     await api.createQueryCollection(collectionItem);
     report.collectionCreated = true;
     report.addedCount = collectionItem.length;
   } catch (error) {
-    throwIfUnexpected(error);
+    throwIfUnexpected(error, ['already-exists']);
     // The collection exists, but the contents are unknown
     // Ensure each query is in the allow list
     let existingQueries: QueryCollection[] = [];
@@ -77,7 +87,7 @@ export async function run(
         await api.addQueryToCollection(item);
         report.addedCount++;
       } catch (error) {
-        throwIfUnexpected(error);
+        throwIfUnexpected(error, ['already-exists']);
         report.existingCount++;
         existingQueries = [...existingQueries, item];
       }
