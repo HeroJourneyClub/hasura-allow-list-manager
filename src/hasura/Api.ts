@@ -59,38 +59,42 @@ export function init(hasuraUri: string, adminSecret: string): Api {
         config
       );
     },
-    dropQueryCollection(): Promise<AxiosResponse>  {
+    dropQueryCollection(): Promise<AxiosResponse> {
       return axios.post(
-        uri, {
-          type:"bulk",
-          args: [{
-            type:"drop_query_collection",
-            args:{
-              collection:"allowed-queries",
-              cascade:true
-            }
-          }]
+        uri,
+        {
+          type: 'drop_query_collection',
+          args: {
+            collection: 'allowed-queries',
+            cascade: true,
+          },
         },
-        config,
-      )
+        config
+      );
     },
     addCollectionToAllowList(): Promise<AxiosResponse> {
-      return axios.post(uri, {
-        type: 'add_collection_to_allowlist',
-        args: {
-          collection: collectionName,
+      return axios.post(
+        uri,
+        {
+          type: 'add_collection_to_allowlist',
+          args: {
+            collection: collectionName,
+          },
         },
-        config,
-      });
+        config
+      );
     },
     dropCollectionFromAllowList(): Promise<AxiosResponse> {
-      return axios.post(uri, {
-        type: 'drop_collection_from_allowlist',
-        args: {
-          collection: collectionName,
+      return axios.post(
+        uri,
+        {
+          type: 'drop_collection_from_allowlist',
+          args: {
+            collection: collectionName,
+          },
         },
-        config,
-      });
+        config
+      );
     },
     exportMetadata(): Promise<AxiosResponse> {
       return axios.post(

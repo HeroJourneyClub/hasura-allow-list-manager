@@ -73,7 +73,9 @@ export async function run(
   }
 
   try {
-    await api.createQueryCollection(collectionItem);
+    await api.createQueryCollection(collectionItem).then(() => {
+      return api.addCollectionToAllowList()
+    })
     report.collectionCreated = true;
     report.addedCount = collectionItem.length;
   } catch (error) {
