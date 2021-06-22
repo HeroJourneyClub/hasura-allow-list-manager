@@ -1,4 +1,4 @@
-import { Source } from '@graphql-toolkit/common';
+import { Source } from '@graphql-tools/utils';
 import { TypeDefinitionNode } from 'graphql';
 
 export interface QueryCollection {

@@ -1,5 +1,5 @@
 import { OperationDefinitionNode } from 'graphql';
-import { Source } from '@graphql-toolkit/common';
+import { Source } from '@graphql-tools/utils';
 
 export function createOperationDefinitionNodes(
   sources: Source[]

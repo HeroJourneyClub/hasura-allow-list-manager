@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import { getIntrospectionQuery, OperationDefinitionNode } from 'graphql';
-import { loadDocuments } from '@graphql-toolkit/core';
-import { GraphQLFileLoader } from '@graphql-toolkit/graphql-file-loader';
+import { loadDocuments } from '@graphql-tools/load';
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import {
   init,
   hasuraService,
