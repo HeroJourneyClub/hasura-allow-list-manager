@@ -15,7 +15,7 @@ export function question(message: string) {
       })
   }
 
-  return new Promise(resolve => {
+  return new Promise<string>(resolve => {
     readline.question(message, answer => {
       resolve(answer);
       readline.resume();

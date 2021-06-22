@@ -70,7 +70,7 @@ run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList)
 
       question(
         'Do you want to continue? This will replace the changed queries on Hasura! y/n -> '
-      ).then((answer: string) => {
+      ).then(answer => {
         if (answer.toLowerCase().trim() === 'y') {
           replaceQueries(changedQueries);
         } else {

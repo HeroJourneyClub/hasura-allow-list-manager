@@ -24,11 +24,14 @@ export type RunReport = {
 
 function throwIfUnexpected(error: AxiosError, acceptable_errors: string[]): void {
   if (
-    error.response === undefined ||
-    error.response.data.code !== 'already-exists' && 'already-exists' in acceptable_errors ||
-    error.response.data.code !== 'not-exists' && "not-exists" in acceptable_errors
-  )
-    throw error;
+    error.response === undefined || !acceptable_errors.includes(error.response.data.code)
+  ) {
+    if (error.response?.data?.error) {
+      throw Error(error.response?.data?.error)
+    } else {
+      throw error;
+    }
+  }
 }
 
 export async function run(
