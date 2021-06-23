@@ -5,7 +5,7 @@ import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import {
   init,
   hasuraService,
-  createQueryCollection,
+  createQueryCollections,
   createOperationDefinitionNodes,
   QueryCollection,
   getChangedQueries,
@@ -45,11 +45,11 @@ export async function run(
     loaders: [new GraphQLFileLoader()],
   });
 
-  const collectionItem = createQueryCollection(sources);
+  const queryCollections = createQueryCollections(sources);
   const definitionNodes = createOperationDefinitionNodes(sources);
 
   if (allowIntrospection)
-    collectionItem.push({
+    queryCollections.push({
       name: 'IntrospectionQuery',
       query: getIntrospectionQuery(),
     });
@@ -76,25 +76,25 @@ export async function run(
   }
 
   try {
-    await api.createQueryCollection(collectionItem).then(() => {
+    await api.createQueryCollection(queryCollections).then(() => {
       return api.addCollectionToAllowList()
     })
     report.collectionCreated = true;
-    report.addedCount = collectionItem.length;
+    report.addedCount = queryCollections.length;
   } catch (error) {
     throwIfUnexpected(error, ['already-exists']);
     // The collection exists, but the contents are unknown
     // Ensure each query is in the allow list
     let existingQueries: QueryCollection[] = [];
 
-    for (const item of collectionItem) {
+    for (const query of queryCollections) {
       try {
-        await api.addQueryToCollection(item);
+        await api.addQueryToCollection(query);
         report.addedCount++;
       } catch (error) {
         throwIfUnexpected(error, ['already-exists']);
         report.existingCount++;
-        existingQueries = [...existingQueries, item];
+        existingQueries = [...existingQueries, query];
       }
     }
 

@@ -1,10 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`e2e Hasura unavailable throws if the endpoint cannot be reached 1`] = `[Error: Network Error]`;
-
 exports[`e2e clean state finds GraphQL operations as SDL within .graphql files, and adds them to the Hasura allow list 1`] = `
 "{
-    \\"addedCount\\": 2,
+    \\"addedCount\\": 3,
     \\"existingCount\\": 0,
     \\"changed\\": 0,
     \\"collectionCreated\\": true,
@@ -226,7 +224,7 @@ exports[`e2e clean state finds GraphQL operations as SDL within .graphql files, 
 
 exports[`e2e clean state optionally includes the introspection query 1`] = `
 "{
-    \\"addedCount\\": 3,
+    \\"addedCount\\": 4,
     \\"existingCount\\": 0,
     \\"changed\\": 0,
     \\"collectionCreated\\": true,
@@ -533,7 +531,7 @@ exports[`e2e previous state allows new queries to be added from different source
 exports[`e2e previous state finds GraphQL operations as SDL within .graphql files, and adds new items to the Hasura allow list 1`] = `
 "{
     \\"addedCount\\": 0,
-    \\"existingCount\\": 2,
+    \\"existingCount\\": 3,
     \\"changed\\": 0,
     \\"collectionCreated\\": false,
     \\"operationDefinitionsFound\\": [

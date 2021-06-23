@@ -33,14 +33,16 @@ describe('e2e', () => {
     it('finds GraphQL operations as SDL within .graphql files, and adds them to the Hasura allow list', async () => {
       const report = await run(hasuraUri, adminSecret, sourcePathOne);
       expect(report.existingCount).toBe(0);
-      expect(report.addedCount).toBe(2);
+      expect(report.addedCount).toBe(3);
+      expect(report.collectionCreated).toBe(true);
       expect(JSON.stringify(report, null, 4)).toMatchSnapshot();
     });
 
     it('optionally includes the introspection query', async () => {
       const report = await run(hasuraUri, adminSecret, sourcePathOne, true);
       expect(report.existingCount).toBe(0);
-      expect(report.addedCount).toBe(3);
+      expect(report.addedCount).toBe(4);
+      expect(report.collectionCreated).toBe(true);
       expect(JSON.stringify(report, null, 4)).toMatchSnapshot();
     });
   });
@@ -53,12 +55,12 @@ describe('e2e', () => {
       });
       await delay(2000);
       const report = await run(hasuraUri, adminSecret, sourcePathOne);
-      expect(report.addedCount).toBe(2);
+      expect(report.addedCount).toBe(3);
     });
 
     it('finds GraphQL operations as SDL within .graphql files, and adds new items to the Hasura allow list', async () => {
       const report = await run(hasuraUri, adminSecret, sourcePathOne);
-      expect(report.existingCount).toBe(2);
+      expect(report.existingCount).toBe(3);
       expect(report.collectionCreated).toBe(false);
       expect(report.addedCount).toBe(0);
       expect(JSON.stringify(report, null, 4)).toMatchSnapshot();
@@ -79,7 +81,7 @@ describe('e2e', () => {
       try {
         await run(hasuraUri, adminSecret, sourcePathOne);
       } catch (error) {
-        expect(error).toMatchSnapshot();
+        expect(error.code).toBe('ECONNREFUSED')
       }
     });
   });

@@ -1,0 +1,21 @@
+schema {
+  query: query_root
+  mutation: mutation_root
+}
+
+type Unsupported {
+  value: String!
+}
+
+scalar DateTime
+
+fragment Frag on FragType {
+  fragValue
+}
+
+query fragmentQuery {
+  testFragment {
+    ...Frag
+  }
+  value
+}

@@ -1,0 +1,95 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createQueryCollections generate a query by operation 1`] = `
+Array [
+  Object {
+    "name": "firstQuery",
+    "query": "query firstQuery {
+  three {
+    four
+  }
+}",
+  },
+  Object {
+    "name": "secondQuery",
+    "query": "query secondQuery {
+  five {
+    six
+  }
+}",
+  },
+]
+`;
+
+exports[`createQueryCollections handle fragment and move them to end of query 1`] = `
+Array [
+  Object {
+    "name": "fragmentQuery",
+    "query": "query fragmentQuery {
+  testFragment {
+    ...Frag
+  }
+  value
+}
+
+fragment Frag on FragType {
+  fragValue
+}",
+  },
+]
+`;
+
+exports[`createQueryCollections handle recursive fragment and move them to end of query 1`] = `
+Array [
+  Object {
+    "name": "fragmentQuery",
+    "query": "query fragmentQuery {
+  testFragment {
+    ...Frag
+  }
+  value
+}
+
+fragment Frag on FragType {
+  fragValue
+  testFrag2 {
+    ...Frag2
+  }
+}
+
+fragment Frag2 on FragType {
+  fragValue2
+}",
+  },
+]
+`;
+
+exports[`createQueryCollections ignores other types than operation and fragment 1`] = `
+Array [
+  Object {
+    "name": "fragmentQuery",
+    "query": "query fragmentQuery {
+  testFragment {
+    ...Frag
+  }
+  value
+}
+
+fragment Frag on FragType {
+  fragValue
+}",
+  },
+]
+`;
+
+exports[`createQueryCollections ignores unused fragment 1`] = `
+Array [
+  Object {
+    "name": "fragmentQuery",
+    "query": "query fragmentQuery {
+  value
+  value2
+}",
+  },
+]
+`;

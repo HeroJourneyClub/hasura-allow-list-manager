@@ -1,5 +1,5 @@
 export {
-  createQueryCollection,
+  createQueryCollections,
   QueryCollection,
   getChangedQueries,
   toMap,

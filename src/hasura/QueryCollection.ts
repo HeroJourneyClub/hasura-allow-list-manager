@@ -67,7 +67,7 @@ export function sourceToQueryCollection(prevQueryCollections: QueryCollection[],
   }
 
 
-export function createQueryCollection(sources: Source[]): QueryCollection[] {
+export function createQueryCollections(sources: Source[]): QueryCollection[] {
   return sources.reduce<QueryCollection[]>((acc, source) => {
     return sourceToQueryCollection(acc, source)
   }, []);

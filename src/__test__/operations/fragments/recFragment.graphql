@@ -1,0 +1,17 @@
+fragment Frag on FragType {
+  fragValue
+  testFrag2 {
+    ...Frag2
+  }
+}
+
+query fragmentQuery {
+  testFragment {
+    ...Frag
+  }
+  value
+}
+
+fragment Frag2 on FragType {
+  fragValue2
+}
