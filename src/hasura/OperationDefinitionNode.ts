@@ -1,7 +1,7 @@
 import { OperationDefinitionNode } from 'graphql';
 import { Source } from '@graphql-tools/utils';
 
-export function createOperationDefinitionNodes(
+export function getOperationDefinitionNodes(
   sources: Source[]
 ): OperationDefinitionNode[] {
   return sources.reduce<OperationDefinitionNode[]>((sourceAcc, source) => {

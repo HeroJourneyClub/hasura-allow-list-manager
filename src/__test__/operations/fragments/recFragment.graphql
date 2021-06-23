@@ -5,7 +5,7 @@ fragment Frag on FragType {
   }
 }
 
-query fragmentQuery {
+query fragmentQuery2 {
   testFragment {
     ...Frag
   }

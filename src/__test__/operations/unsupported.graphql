@@ -13,7 +13,7 @@ fragment Frag on FragType {
   fragValue
 }
 
-query fragmentQuery {
+query fragmentQuery4 {
   testFragment {
     ...Frag
   }

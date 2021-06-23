@@ -4,7 +4,7 @@ exports[`e2e clean state finds GraphQL operations as SDL within .graphql files, 
 "{
     \\"addedCount\\": 3,
     \\"existingCount\\": 0,
-    \\"changed\\": 0,
+    \\"updated\\": 0,
     \\"collectionCreated\\": true,
     \\"operationDefinitionsFound\\": [
         {
@@ -217,8 +217,7 @@ exports[`e2e clean state finds GraphQL operations as SDL within .graphql files, 
                 \\"end\\": 42
             }
         }
-    ],
-    \\"changedQueries\\": []
+    ]
 }"
 `;
 
@@ -226,9 +225,8 @@ exports[`e2e clean state optionally includes the introspection query 1`] = `
 "{
     \\"addedCount\\": 4,
     \\"existingCount\\": 0,
-    \\"changed\\": 0,
+    \\"updated\\": 0,
     \\"collectionCreated\\": true,
-    \\"introspectionAllowed\\": true,
     \\"operationDefinitionsFound\\": [
         {
             \\"kind\\": \\"OperationDefinition\\",
@@ -440,18 +438,16 @@ exports[`e2e clean state optionally includes the introspection query 1`] = `
                 \\"end\\": 42
             }
         }
-    ],
-    \\"changedQueries\\": []
+    ]
 }"
 `;
 
 exports[`e2e previous state allows new queries to be added from different source pointers 1`] = `
 "{
     \\"addedCount\\": 2,
-    \\"existingCount\\": 0,
-    \\"changed\\": 0,
+    \\"existingCount\\": 3,
+    \\"updated\\": 0,
     \\"collectionCreated\\": false,
-    \\"introspectionAllowed\\": true,
     \\"operationDefinitionsFound\\": [
         {
             \\"kind\\": \\"OperationDefinition\\",
@@ -523,8 +519,7 @@ exports[`e2e previous state allows new queries to be added from different source
                 \\"end\\": 41
             }
         }
-    ],
-    \\"changedQueries\\": []
+    ]
 }"
 `;
 
@@ -532,7 +527,7 @@ exports[`e2e previous state finds GraphQL operations as SDL within .graphql file
 "{
     \\"addedCount\\": 0,
     \\"existingCount\\": 3,
-    \\"changed\\": 0,
+    \\"updated\\": 0,
     \\"collectionCreated\\": false,
     \\"operationDefinitionsFound\\": [
         {
@@ -745,7 +740,6 @@ exports[`e2e previous state finds GraphQL operations as SDL within .graphql file
                 \\"end\\": 42
             }
         }
-    ],
-    \\"changedQueries\\": []
+    ]
 }"
 `;

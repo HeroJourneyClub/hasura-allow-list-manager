@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 import { run } from './run';
-import { question } from './question';
-import { init, hasuraService, QueryCollection } from './hasura';
 import { getParams } from './cli';
 
 const options = getParams(process.argv);
-
 
 const hasuraUri = options.host;
 const adminSecret = options.adminSecret;
@@ -22,33 +19,16 @@ if (hasuraUri === undefined) {
   throw new Error('Hasura URI must be passed as the second argument');
 }
 
-const api = init(hasuraUri, adminSecret);
-const service = hasuraService(api);
-
-function replaceQueries(queries: QueryCollection[]) {
-  Promise.all(queries.map(service.replaceQueryFromCollection))
-    .then(() => {
-      console.log('Queries updated!');
-      process.exit(0);
-    })
-    .catch(e => {
-      console.log('Error on update queries!', e);
-      process.exit(1);
-    });
-}
-
-run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList)
+run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList, forceReplace)
   .then(
     ({
-      introspectionAllowed,
       operationDefinitionsFound,
       addedCount,
       existingCount,
-      changed,
-      changedQueries,
+      updated,
     }) => {
       console.log(
-        `Introspection allowed: ${introspectionAllowed} | Found: ${operationDefinitionsFound.length} | Added: ${addedCount} | Existing: ${existingCount} | Changed: ${changed} \n`
+        `Introspection allowed: ${allowIntrospection} | Found: ${operationDefinitionsFound.length} | Added: ${addedCount} | Existing: ${existingCount} | Updated: ${updated} \n`
       );
 
       if (process.env.DEBUG) {
@@ -57,26 +37,7 @@ run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList)
         );
       }
 
-      if (changed === 0) {
-        process.exit(0);
-        return;
-      }
-
-      if (forceReplace) {
-        console.log('Forcing queries replacement...');
-        replaceQueries(changedQueries);
-        return;
-      }
-
-      question(
-        'Do you want to continue? This will replace the changed queries on Hasura! y/n -> '
-      ).then(answer => {
-        if (answer.toLowerCase().trim() === 'y') {
-          replaceQueries(changedQueries);
-        } else {
-          process.exit(0);
-        }
-      });
+      process.exit(0);
     }
   )
   .catch(error => console.error(error));

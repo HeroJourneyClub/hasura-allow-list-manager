@@ -6,20 +6,19 @@ import {
   init,
   hasuraService,
   createQueryCollections,
-  createOperationDefinitionNodes,
+  getOperationDefinitionNodes,
   QueryCollection,
-  getChangedQueries,
+  getAddedOrUpdatedQueries,
 } from './hasura';
+import { question } from './question';
 import { printQueryDiff } from './diff';
 
 export type RunReport = {
   addedCount: number;
-  changed: number;
+  updated: number;
   collectionCreated: boolean;
   existingCount: number;
-  introspectionAllowed: boolean;
   operationDefinitionsFound: OperationDefinitionNode[];
-  changedQueries: QueryCollection[];
 };
 
 function throwIfUnexpected(error: AxiosError, acceptable_errors: string[]): void {
@@ -40,13 +39,15 @@ export async function run(
   sourcePaths: string | string[],
   allowIntrospection?: boolean,
   resetAllowList?: boolean,
+  forceReplace?: boolean
 ): Promise<RunReport> {
+  const api = init(hasuraUri, adminSecret);
+
   const sources = await loadDocuments(sourcePaths, {
     loaders: [new GraphQLFileLoader()],
   });
 
   const queryCollections = createQueryCollections(sources);
-  const definitionNodes = createOperationDefinitionNodes(sources);
 
   if (allowIntrospection)
     queryCollections.push({
@@ -57,15 +58,10 @@ export async function run(
   const report: RunReport = {
     addedCount: 0,
     existingCount: 0,
-    changed: 0,
+    updated: 0,
     collectionCreated: false,
-    introspectionAllowed: allowIntrospection,
-    operationDefinitionsFound: definitionNodes,
-    changedQueries: [],
+    operationDefinitionsFound: getOperationDefinitionNodes(sources),
   };
-
-  const api = init(hasuraUri, adminSecret);
-  const service = hasuraService(api);
 
   if (resetAllowList) {
     try {
@@ -75,39 +71,60 @@ export async function run(
     }
   }
 
-  try {
-    await api.createQueryCollection(queryCollections).then(() => {
-      return api.addCollectionToAllowList()
-    })
+  const service = await hasuraService(api);
+
+  if (!service.hasQueryCollections) {
+    await api.createQueryCollection(queryCollections)
     report.collectionCreated = true;
     report.addedCount = queryCollections.length;
-  } catch (error) {
-    throwIfUnexpected(error, ['already-exists']);
-    // The collection exists, but the contents are unknown
-    // Ensure each query is in the allow list
-    let existingQueries: QueryCollection[] = [];
-
-    for (const query of queryCollections) {
-      try {
-        await api.addQueryToCollection(query);
-        report.addedCount++;
-      } catch (error) {
-        throwIfUnexpected(error, ['already-exists']);
-        report.existingCount++;
-        existingQueries = [...existingQueries, query];
-      }
-    }
-
-    const remoteQueries = await service.getRemoteAllowedQueryCollection();
-    const changedQueries = await getChangedQueries(
-      remoteQueries,
-      existingQueries
+  } else {
+    // The main query collection ('allowed-queries') already exist. Must upddate it with new or updated queries
+    const { added: addedQueries, updated: updatedQueries} = getAddedOrUpdatedQueries(
+      service.remoteQueries,
+      queryCollections
     );
 
-    printQueryDiff(remoteQueries, changedQueries);
+    report.existingCount = service.remoteQueries.length
+    report.addedCount = addedQueries.length;
+    report.updated = updatedQueries.length;
 
-    report.changed = changedQueries.length;
-    report.changedQueries = changedQueries;
+    await Promise.all(addedQueries.map(query => {
+      return api.addQueryToCollection(query);
+    }))
+
+    printQueryDiff(service.remoteQueries, updatedQueries);
+
+    const replaceQueries = (queries: QueryCollection[]) => {
+      Promise.all(queries.map(service.replaceQueryFromCollection))
+        .then(() => {
+          console.log('Queries updated!');
+          process.exit(0);
+        })
+        .catch(e => {
+          console.log('Error on update queries!', e);
+          process.exit(1);
+        });
+    }
+
+    if (forceReplace) {
+      console.log('Forcing queries replacement...');
+      replaceQueries(updatedQueries);
+    } else if (updatedQueries.length > 0) {
+      await question(
+        'Do you want to continue? This will replace the changed queries on Hasura! y/n -> '
+      ).then(answer => {
+        if (answer.toLowerCase().trim() === 'y') {
+          replaceQueries(updatedQueries);
+        } else {
+          report.updated = 0;
+        }
+      });
+    }
   }
-  return report;
+
+  if (!service.queryCollectionsPresentInAllowList) {
+    await api.addCollectionToAllowList()
+  }
+
+  return report
 }

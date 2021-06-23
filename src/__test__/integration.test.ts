@@ -68,7 +68,7 @@ describe('e2e', () => {
 
     it('allows new queries to be added from different source pointers', async () => {
       const report = await run(hasuraUri, adminSecret, sourcePathTwo, true);
-      expect(report.existingCount).toBe(0);
+      expect(report.existingCount).toBe(3);
       expect(report.collectionCreated).toBe(false);
       expect(report.addedCount).toBe(2);
       expect(JSON.stringify(report, null, 4)).toMatchSnapshot();

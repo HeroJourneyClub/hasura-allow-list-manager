@@ -82,15 +82,24 @@ export function toMap(
   }, new Map());
 }
 
-export function getChangedQueries(
+export function getAddedOrUpdatedQueries(
   oldQueries: QueryCollection[],
   newQueries: QueryCollection[]
 ) {
   const oldMap = toMap(oldQueries);
 
-  return newQueries.filter(({ query, name }) => {
-    const oldQuery = oldMap.get(name);
+  return newQueries.reduce<{
+    added: QueryCollection[];
+    updated: QueryCollection[];
+  }> (
+    (acc, query) => {
+      const oldQuery = oldMap.get(query.name);
 
-    return oldQuery !== query;
-  });
+      return {
+        added: !!oldQuery ? acc['added'] : acc['added'].concat(query),
+        updated: !!oldQuery && oldQuery !== query.query ? acc['updated'].concat(query) : acc['updated']
+      };
+    },
+    { added: [], updated: [] }
+  );
 }

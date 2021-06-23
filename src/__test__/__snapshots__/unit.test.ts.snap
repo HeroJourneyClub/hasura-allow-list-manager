@@ -42,8 +42,8 @@ fragment Frag on FragType {
 exports[`createQueryCollections handle recursive fragment and move them to end of query 1`] = `
 Array [
   Object {
-    "name": "fragmentQuery",
-    "query": "query fragmentQuery {
+    "name": "fragmentQuery2",
+    "query": "query fragmentQuery2 {
   testFragment {
     ...Frag
   }
@@ -67,8 +67,8 @@ fragment Frag2 on FragType {
 exports[`createQueryCollections ignores other types than operation and fragment 1`] = `
 Array [
   Object {
-    "name": "fragmentQuery",
-    "query": "query fragmentQuery {
+    "name": "fragmentQuery4",
+    "query": "query fragmentQuery4 {
   testFragment {
     ...Frag
   }
@@ -85,8 +85,8 @@ fragment Frag on FragType {
 exports[`createQueryCollections ignores unused fragment 1`] = `
 Array [
   Object {
-    "name": "fragmentQuery",
-    "query": "query fragmentQuery {
+    "name": "fragmentQuery3",
+    "query": "query fragmentQuery3 {
   value
   value2
 }",
