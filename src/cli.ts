@@ -11,7 +11,8 @@ program
     'Replace change queries, not asking for continue'
   )
   .option('-i, --allow-introspection', 'Send Introspection query')
-  .option('-r, --reset', 'Delete all allow lists before running insert');
+  .option('-r, --reset', 'Delete all allow lists before running insert')
+  .option('-v, --version <version>', 'Version queries instead of replacing them. Incompatible with -f');
 
 export function getParams(args: string[]) {
   program.parse(args);

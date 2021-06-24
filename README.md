@@ -1,10 +1,16 @@
-# hasura-allowed-queries
+# Manager for hasura allow-list
 
-Populate the [Hasura allow-list](https://hasura.io/docs/1.0/graphql/manual/deployment/allow-list.html) from found GraphQL operations in a path, including queries, mutations, and subscriptions; replacing the existing ones.
+Automatically Populate the Hasura allow-list from found GraphQL operations in a path, including queries, mutations, and subscriptions.
+Supports update and versioning.
+
+More on [Hasura allow-list](https://hasura.io/docs/latest/graphql/core/deployment/allow-list.html)
 
 ## Why
 
-Hasura only accepts a collection query named "allowed-queries", and its [Query Collection API](https://hasura.io/docs/1.0/graphql/core/api-reference/schema-metadata-api/query-collections.html) doesn't have the option to update an existing query, making it difficult to update queries with the same name. Forcing us to remove the query and add it again.
+From hasura:
+> In production instances: Enabling the allow-list is highly recommended when running the GraphQL engine in production.
+
+Allow list is a important security feature that restrict the GraphQL engine so that it executes *only* those operations that are present in the list. But managing allow-list manually can be tendious and prone to error.
 
 ## How it works
 
@@ -38,6 +44,15 @@ hasura-allowed-queries [options]
 - `-f | --force-replace` Replace change queries, not prompt and asking for continue
 - `-i | --allow-instrospection` Send the Introspection query with your queries
 - `-r | --reset` Delete all allow lists before running insert
+- `-v | --version <version>` Version queries instead of replacing them. Incompatible with -f.
+
+### Versioning behavior
+
+- `-v --version <version>` allows to version queries instead of updating them. This is especially useful for mobile app where client can take several weeks to update.
+- The current behavior is to never remove past queries. When a query with the same name and different query is detected, it will create a new query to the allow list collection with the current timestamp and version.
+- The version query name format is the following: `$NAME___($TIMESTAMP-$VERSION)`
+- If you start versioning, you must continue versioning.
+
 
 ## Development
 

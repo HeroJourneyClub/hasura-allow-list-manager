@@ -10,6 +10,7 @@ const sourcePath = options.path;
 const forceReplace = options.forceReplace;
 const allowIntrospection = !!options.allowInstrospection;
 const resetAllowList = !!options.reset
+const version = options.version
 
 if (sourcePath === undefined) {
   throw new Error('Source path must be passed as first argument');
@@ -19,7 +20,7 @@ if (hasuraUri === undefined) {
   throw new Error('Hasura URI must be passed as the second argument');
 }
 
-run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList, forceReplace)
+run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList, forceReplace, version)
   .then(
     ({
       operationDefinitionsFound,

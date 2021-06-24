@@ -82,10 +82,88 @@ export function toMap(
   }, new Map());
 }
 
+const nameToVersionRe = /(.*)___\(([0-9]+)-(.+)\)$/;
+
+type QueryCollectionWithVersion = {
+  name: string,
+  query: string
+  date: Date | null,
+  version: string | null,
+}
+
+function queryToVersionData(query: QueryCollection) : QueryCollectionWithVersion {
+  const m = query.name.match(nameToVersionRe)
+
+  return {
+    query: query.query,
+    name: m ? m[1] : query.name,
+    date: m ? new Date(parseInt(m[2])) : null,
+    version: m ? m[3] :null,
+  }
+}
+
+export function addVersionToQueryName(name: string, version: string) {
+  return `${name}___(${Date.now()}-${version})`
+}
+
+export function getAddedOrUpdatedQueriesVersion(
+  oldQueries: QueryCollection[],
+  newQueries: QueryCollection[],
+  version: string,
+) : { added: QueryCollection[], updated: QueryCollection[]} {
+
+  const lastOldQueryPerVersion = oldQueries.reduce<Record<string, QueryCollectionWithVersion>>((acc, query) => {
+    const queryVersion = queryToVersionData(query)
+    const prevQueryVersion = acc[queryVersion.name]
+
+    if (!prevQueryVersion || prevQueryVersion.date < queryVersion.date) {
+      acc[queryVersion.name] = queryVersion
+    }
+
+    return acc
+  }, {})
+
+
+  // Build a list of name + version to check duplicated version existants
+  const queryNameVersionList = oldQueries.reduce<string[]>(( acc, query ) => {
+    const queryVersion = queryToVersionData(query)
+    if (queryVersion.version) {
+      acc.push(queryVersion.name + queryVersion.version)
+    }
+    return acc
+  }, [])
+
+  return newQueries.reduce<{
+    added: QueryCollection[];
+    updated: QueryCollection[];
+  }> (
+    (acc, query) => {
+      const oldQuery = lastOldQueryPerVersion[query.name]
+
+      if (queryNameVersionList.includes(query.name + version) && oldQuery?.query != query.query) {
+        throw Error(`Query with name '${query.name}' and version '${version}' already exists with different content. Update version number.`)
+      }
+
+      query.name = addVersionToQueryName(query.name, version)
+
+      return {
+        added: !!oldQuery ? acc['added'] : acc['added'].concat(query),
+        updated: !!oldQuery && oldQuery.query !== query.query ? acc['updated'].concat(query) : acc['updated']
+      };
+    },
+    { added: [], updated: [] }
+  )
+}
+
 export function getAddedOrUpdatedQueries(
   oldQueries: QueryCollection[],
-  newQueries: QueryCollection[]
+  newQueries: QueryCollection[],
+  version: string
 ) {
+  if (version) {
+    return getAddedOrUpdatedQueriesVersion(oldQueries, newQueries, version)
+  }
+
   const oldMap = toMap(oldQueries);
 
   return newQueries.reduce<{
