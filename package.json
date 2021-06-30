@@ -1,10 +1,10 @@
 {
-  "name": "@taller/hasura-allowed-queries",
-  "version": "0.1.5",
-  "description": "Populate the Hasura allow-list from found GraphQL operations in a path",
+  "name": "@homeskillet/hasura-allow-list-manager",
+  "version": "0.2.0",
+  "description": "Populate the Hasura allow-list from found GraphQL operations found in a path",
   "main": "dist/index.js",
   "bin": {
-    "hasura-allowed-queries": "dist/start.js"
+    "hasura-allow-list-manager": "dist/start.js"
   },
   "scripts": {
     "preglobal:add": "npm run build",
@@ -17,24 +17,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TallerWebSolutions/hasura-allowed-queries.git"
+    "url": "git+"
   },
   "keywords": [
     "Hasura",
     "GraphQL"
   ],
   "maintainers": [
-    "Taller team <dev@taller.net.br>",
-    "Rhys Bartels-Waller <rhyslbw@gmail.com>"
+    "Homeskillet <dev@homeskillet.app>"
   ],
   "engines": {
     "node": "^10 || ^14"
   },
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/TallerWebSolutions/hasura-allowed-queries/issues"
+    "url": "https://github.com/HomeskilletHealthInc/hasura-allow-list-manager/issues"
   },
-  "homepage": "https://github.com/TallerWebSolutions/hasura-allowed-queries#README.md",
+  "homepage": "https://github.com/HomeskilletHealthInc/hasura-allow-list-manager#README.md",
   "dependencies": {
     "@graphql-tools/graphql-file-loader": "^6.2.7",
     "@graphql-tools/load": "^6.2.8",
