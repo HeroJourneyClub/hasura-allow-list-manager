@@ -1,6 +1,6 @@
 {
   "name": "@homeskillet/hasura-allow-list-manager",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Populate the Hasura allow-list from found GraphQL operations found in a path",
   "main": "dist/index.js",
   "bin": {
