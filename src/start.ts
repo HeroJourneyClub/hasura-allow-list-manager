@@ -41,4 +41,8 @@ run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList, forc
       process.exit(0);
     }
   )
-  .catch(error => console.error(error));
+  .catch(error => {
+    console.error(error);
+    process.exitCode = -1
+  }
+);

@@ -15,7 +15,7 @@ Allow list is a important security feature that restrict the GraphQL engine so t
 ## How it works
 
 The local queries, mutations, and subscriptions defined in `.graphql` or `.gql` files will be compared with the remote Hasura server.
-The new definitions will be sent to Hasura and the existing ones will be compared and the difference between them will be shown. The replacement will be done by removing the remote query and re-adding the local changed query.
+The new definitions will be sent to Hasura and the existing ones will be compared and the difference between them will be shown. The replacement will be done by removing the remote query and replacing it with the local query.
 
 ### Versioning behavior
 
@@ -27,13 +27,13 @@ The new definitions will be sent to Hasura and the existing ones will be compare
 ## Installation
 
 ```bash
-npm install --save-dev @homeskillet/hasura-allow-list-manager
+npm install --save-dev @herojourneyclub/hasura-allow-list-manager
 ```
 
 or yarn
 
 ```bash
-yarn add --dev @homeskillet/hasura-allow-list-manager
+yarn add --dev @herojourneyclub/hasura-allow-list-manager
 ```
 
 ## Usage
@@ -50,7 +50,7 @@ hasura-allow-list-manager [options]
 - `-f | --force-replace` Replace change queries, not prompt and asking for continue
 - `-i | --allow-instrospection` Send the Introspection query with your queries
 - `-r | --reset` Delete all allow lists before running insert
-- `-v | --version <version>` Version queries instead of replacing them. Incompatible with -f.
+- `-v | --version <version>` Version queries instead of replacing them. Incompatible with -f
 
 
 ### Examples
@@ -97,11 +97,7 @@ yarn dev -h http://localhost:8080 -s my-admin-secret -p '**/*.graphql'
 
 ## Contributing
 
-1. Fork it!
-2. Create your feature branch: git checkout -b my-new-feature
-3. Commit your changes: git commit -m 'feat: Add some feature'
-4. Push to the branch: git push origin my-new-feature
-5. Submit a pull request
+Contribution are welcome. Send us your PR or open a issue ticket. Let's build together.
 
 ## Credits
 

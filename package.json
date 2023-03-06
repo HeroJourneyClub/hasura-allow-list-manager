@@ -1,7 +1,7 @@
 {
-  "name": "@homeskillet/hasura-allow-list-manager",
-  "version": "0.2.3",
-  "description": "Populate the Hasura allow-list from found GraphQL operations found in a path",
+  "name": "@herojourneyclub/hasura-allow-list-manager",
+  "version": "1.0.0",
+  "description": "Populate the Hasura allow-list from found GraphQL operations in your project",
   "main": "dist/index.js",
   "bin": {
     "hasura-allow-list-manager": "dist/start.js"
@@ -24,26 +24,26 @@
     "GraphQL"
   ],
   "maintainers": [
-    "Homeskillet <dev@homeskillet.app>"
+    "Hero Journey Club <devs@herojourney.club>"
   ],
   "engines": {
     "node": "^16"
   },
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/HomeskilletHealthInc/hasura-allow-list-manager/issues"
+    "url": "https://github.com/HeroJourneyClub/hasura-allow-list-manager/issues"
   },
-  "homepage": "https://github.com/HomeskilletHealthInc/hasura-allow-list-manager#README.md",
+  "homepage": "https://github.com/HeroJourneyClub/hasura-allow-list-manager#README.md",
   "dependencies": {
-    "@graphql-tools/graphql-file-loader": "^6.2.7",
-    "@graphql-tools/load": "^6.2.8",
-    "@graphql-tools/load-files": "^6.3.2",
-    "@graphql-tools/utils": "^7.10.0",
+    "@graphql-tools/graphql-file-loader": "^7.5.16",
+    "@graphql-tools/load": "^7.8.12",
+    "@graphql-tools/load-files": "^6.6.1",
+    "@graphql-tools/utils": "^9.2.1",
     "axios": "^0.21.4",
     "chalk": "^4.1.1",
     "commander": "^7.2.0",
     "diff": "^5.0.0",
-    "graphql": "^15.5.1"
+    "graphql": "^16.6.0"
   },
   "devDependencies": {
     "@types/diff": "^5.0.0",
@@ -64,7 +64,7 @@
     "prettier": "^2.3.1",
     "shx": "^0.3.2",
     "ts-jest": "^27.0.3",
-    "ts-node-dev": "^1.1.6",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^4.2.3"
   },
   "files": [
