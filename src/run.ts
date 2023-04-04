@@ -13,6 +13,7 @@ import {
 } from './hasura';
 import { question } from './question';
 import { printQueryDiff } from './diff';
+import { QueryFilter } from './queryFilter';
 
 export type RunReport = {
   addedCount: number;
@@ -20,6 +21,7 @@ export type RunReport = {
   collectionCreated: boolean;
   existingCount: number;
   operationDefinitionsFound: OperationDefinitionNode[];
+  removedQueries: number;
 };
 
 function throwIfUnexpected(error: AxiosError, acceptable_errors: string[]): void {
@@ -41,7 +43,9 @@ export async function run(
   allowIntrospection?: boolean,
   resetAllowList?: boolean,
   forceReplace?: boolean,
-  version?: string
+  version?: string,
+  maxVersion?: number,
+  maxVersionDay?: number,
 ): Promise<RunReport> {
   const api = init(hasuraUri, adminSecret);
 
@@ -63,6 +67,7 @@ export async function run(
     updated: 0,
     collectionCreated: false,
     operationDefinitionsFound: getOperationDefinitionNodes(sources),
+    removedQueries: 0,
   };
 
   if (resetAllowList) {
@@ -143,6 +148,30 @@ export async function run(
         });
       }
     }
+  }
+
+  const metadata = await api.exportMetadata();
+  const queries: Array<any> = metadata.data?.query_collections?.[0]?.definition?.queries;
+
+  if (queries != undefined && maxVersion != undefined && maxVersionDay != undefined) {
+    const queryNameRegex = /([a-zA-Z]+)([_]+)\(([\d]+)\-([a-z0-9]+)\)/;
+    const queryFilter = new QueryFilter(maxVersionDay, maxVersion);
+    
+    for (const query of queries) {
+      const queryName = query.name;
+      const queryNameMatch = queryName.match(queryNameRegex);
+      if (queryNameMatch) {
+        const queryTimestamp = queryNameMatch[3];
+        const queryName = queryNameMatch[0];
+
+        queryFilter.addQuery(queryTimestamp, queryName, query.query);
+      }
+    }
+
+    const queriesToDelete = queryFilter.getQueriesToDelete();
+    await Promise.all(queriesToDelete.map(api.dropQueryFromCollection));
+
+    report.removedQueries = queriesToDelete.length;
   }
 
   if (!service.queryCollectionsPresentInAllowList) {

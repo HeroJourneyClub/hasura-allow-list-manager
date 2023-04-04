@@ -11,6 +11,8 @@ const forceReplace = options.forceReplace;
 const allowIntrospection = !!options.allowInstrospection;
 const resetAllowList = !!options.reset
 const version = options.version
+const maxVersion = options.versionMaxVersion;
+const maxVersionDay = options.versionMaxDay;
 
 if (sourcePath === undefined) {
   throw new Error('Source path must be passed as first argument');
@@ -20,16 +22,17 @@ if (hasuraUri === undefined) {
   throw new Error('Hasura URI must be passed as the second argument');
 }
 
-run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList, forceReplace, version)
+run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList, forceReplace, version, maxVersion, maxVersionDay)
   .then(
     ({
       operationDefinitionsFound,
       addedCount,
       existingCount,
       updated,
+      removedQueries,
     }) => {
       console.log(
-        `Introspection allowed: ${allowIntrospection} | Found: ${operationDefinitionsFound.length} | Added: ${addedCount} | Existing: ${existingCount} | Updated: ${updated} \n`
+        `Introspection allowed: ${allowIntrospection} | Found: ${operationDefinitionsFound.length} | Added: ${addedCount} | Existing: ${existingCount} | Updated: ${updated} | Removed: ${removedQueries} \n`
       );
 
       if (process.env.DEBUG) {
