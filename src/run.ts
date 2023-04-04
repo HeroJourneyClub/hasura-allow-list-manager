@@ -153,9 +153,9 @@ export async function run(
   const metadata = await api.exportMetadata();
   const queries: Array<any> = metadata.data?.query_collections?.[0]?.definition?.queries;
 
-  if (queries != undefined && maxVersion != undefined && maxVersionDay != undefined) {
+  if (queries != undefined && (maxVersion != undefined || maxVersionDay != undefined)) {
     const queryNameRegex = /([a-zA-Z]+)([_]+)\(([\d]+)\-([a-z0-9]+)\)/;
-    const queryFilter = new QueryFilter(maxVersionDay, maxVersion);
+    const queryFilter = new QueryFilter(maxVersionDay ?? 0, maxVersion ?? 0);
     
     for (const query of queries) {
       const queryName = query.name;

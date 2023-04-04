@@ -24,7 +24,7 @@ export class QueryFilter {
    * Returns an array of queries to delete
    */
   public getQueriesToDelete(): Array<QueryCollection> {
-    if (this.maxDay <= 0 || this.maxVersion <= 0) {
+    if (this.maxDay <= 0 && this.maxVersion <= 0) {
       return [];
     }
 
@@ -35,7 +35,7 @@ export class QueryFilter {
     const k = this.getK(sortedKeys);
     const queriesToDelete: Array<QueryCollection> = [];
 
-    if (k >= sortedKeys.length) {
+    if (k >= sortedKeys.length || k <= 0) {
       return queriesToDelete;
     }
 
@@ -56,7 +56,7 @@ export class QueryFilter {
    */
   public getK(sortedKeys: Array<string>): number {
     const daysK = this.getDaysK(sortedKeys);
-    const versionK = Math.max(Math.min(this.maxVersion, sortedKeys.length), 1);
+    const versionK = Math.min(this.maxVersion, sortedKeys.length);
 
     return Math.max(daysK, versionK);
   }
@@ -66,6 +66,10 @@ export class QueryFilter {
    * Days-K is the number of timestamps that are not older than `maxDay`.
    */
   public getDaysK(sortedKeys: Array<string>): number {
+    if (this.maxDay <= 0) {
+      return 0;
+    }
+
     const treshold = Date.now() - (this.maxDay * 24 * 60 * 60 * 1000);
 
     let counter = 0;
