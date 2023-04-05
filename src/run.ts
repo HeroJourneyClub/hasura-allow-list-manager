@@ -158,13 +158,13 @@ export async function run(
     const queryFilter = new QueryFilter(maxVersionDay ?? 0, maxVersion ?? 0);
     
     for (const query of queries) {
-      const queryName = query.name;
-      const queryNameMatch = queryName.match(queryNameRegex);
+      const fullQueryName = query.name;
+      const queryNameMatch = fullQueryName.match(queryNameRegex);
       if (queryNameMatch) {
         const queryTimestamp = queryNameMatch[3];
-        const queryName = queryNameMatch[0];
+        const queryName = queryNameMatch[1];
 
-        queryFilter.addQuery(queryTimestamp, queryName, query.query);
+        queryFilter.addQuery(queryTimestamp, fullQueryName, queryName, query.query);
       }
     }
 

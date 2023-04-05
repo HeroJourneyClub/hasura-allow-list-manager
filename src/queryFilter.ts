@@ -1,7 +1,13 @@
 import { QueryCollection } from "./hasura";
 
+type Query = {
+  fullName: string;
+  query: string;
+  timestamp: string;
+};
+
 export class QueryFilter {
-  private queries: Record<string, Array<QueryCollection>> = {};
+  private queries: Record<string, Array<Query>> = {};
   private maxDay: number;
   private maxVersion: number;
 
@@ -10,75 +16,76 @@ export class QueryFilter {
     this.maxVersion = maxVersion;
   }
 
-  public addQuery(timestamp: string, name: string, query: string) {
-    if (!this.queries[timestamp]) {
-      this.queries[timestamp] = [];
+  public addQuery(timestamp: string, fullName: string, name: string, query: string) {
+    if (!this.queries[name]) {
+      this.queries[name] = [];
     }
-    this.queries[timestamp].push({
-      name,
+    this.queries[name].push({
+      fullName,
       query,
+      timestamp,
     });
   }
 
-  /**
-   * Returns an array of queries to delete
-   */
   public getQueriesToDelete(): Array<QueryCollection> {
     if (this.maxDay <= 0 && this.maxVersion <= 0) {
       return [];
     }
 
-    const sortedKeys = Object.keys(this.queries).sort((a, b) => {
-      return parseInt(b) - parseInt(a);
-    });
+    const deleteByDays = this.getQueriesToDeleteByDays();
+    const deleteByVersion = this.getQueriesToDeleteByVersion();
 
-    const k = this.getK(sortedKeys);
-    const queriesToDelete: Array<QueryCollection> = [];
-
-    if (k >= sortedKeys.length || k <= 0) {
-      return queriesToDelete;
+    if (this.maxDay <= 0) {
+      return deleteByVersion;
     }
 
-    for (let i = k; i < sortedKeys.length; i++) {
-      const key = sortedKeys[i];
+    if (this.maxVersion <= 0) {
+      return deleteByDays;
+    }
 
-      if (key) {
-        queriesToDelete.push(...this.queries[key]);
+    return deleteByDays.filter((q) => deleteByVersion.some((q2) => q.name === q2.name));
+  }
+
+  public getQueriesToDeleteByDays(): Array<QueryCollection> {
+    const queriesToDelete: Array<QueryCollection> = [];
+
+    for (const key of Object.keys(this.queries)) {
+      const query = this.queries[key];
+
+      for (const q of query) {
+        const timestamp = parseInt(q.timestamp);
+        const threshold = Date.now() - (this.maxDay * 24 * 60 * 60 * 1000);
+        if (timestamp < threshold) {
+          queriesToDelete.push({
+            name: q.fullName,
+            query: q.query,
+          });
+        }
       }
     }
 
     return queriesToDelete;
   }
 
-  /**
-   * Get k. K is the number of queries that will not be deleted
-   * and it is the higher number between maxVersion-K and maxDay-K.
-   */
-  public getK(sortedKeys: Array<string>): number {
-    const daysK = this.getDaysK(sortedKeys);
-    const versionK = Math.min(this.maxVersion, sortedKeys.length);
+  public getQueriesToDeleteByVersion(): Array<QueryCollection> {
+    const queriesToDelete: Array<QueryCollection> = [];
 
-    return Math.max(daysK, versionK);
-  }
+    for (const key of Object.keys(this.queries)) {
+      const query = this.queries[key];
+      if (query.length <= this.maxVersion) {
+        continue;
+      }
 
-  /**
-   * Get K for days. K is the number of queries that will not be deleted.
-   * Days-K is the number of timestamps that are not older than `maxDay`.
-   */
-  public getDaysK(sortedKeys: Array<string>): number {
-    if (this.maxDay <= 0) {
-      return 0;
-    }
+      query.sort((a, b) => parseInt(b.timestamp) - parseInt(a.timestamp));
 
-    const treshold = Date.now() - (this.maxDay * 24 * 60 * 60 * 1000);
-
-    let counter = 0;
-    for (const key of sortedKeys) {
-      if (parseInt(key) >= treshold) {
-        counter++;
+      for (let i = this.maxVersion; i < query.length; i++) {
+        queriesToDelete.push({
+          name: query[i].fullName,
+          query: query[i].query,
+        });
       }
     }
 
-    return Math.max(counter, 1);
+    return queriesToDelete;
   }
 }
