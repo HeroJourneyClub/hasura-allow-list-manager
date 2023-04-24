@@ -1,5 +1,5 @@
 import { Source } from '@graphql-tools/utils';
-import { DefinitionNode, FragmentDefinitionNode, OperationDefinitionNode, visit, print } from 'graphql';
+import { DefinitionNode, FragmentDefinitionNode, OperationDefinitionNode, visit, print, parse } from 'graphql';
 
 export interface QueryCollection {
   name: string;
@@ -140,19 +140,34 @@ export function getAddedOrUpdatedQueriesVersion(
     (acc, query) => {
       const oldQuery = lastOldQueryPerVersion[query.name]
 
-      if (queryNameVersionList.includes(query.name + version) && oldQuery?.query != query.query) {
-        throw Error(`Query with name '${query.name}' and version '${version}' already exists with different content. Update version number.`)
+      if (queryNameVersionList.includes(query.name + version)) {
+        if (oldQuery != undefined) {
+          if (!areEqualQueries(query.query, oldQuery?.query)) {
+            throw Error(`Query with name '${query.name}' and version '${version}' already exists with different content. Update version number. \nOld query:\n${oldQuery?.query}\nnew query:\n${query.query}`)
+          }
+        }
       }
 
       query.name = addVersionToQueryName(query.name, version)
 
+      // If the queries are equal it's not an update
+      const isUpdate = oldQuery?.query ? !areEqualQueries(query.query, oldQuery?.query) : true;
+
       return {
         added: !!oldQuery ? acc['added'] : acc['added'].concat(query),
-        updated: !!oldQuery && oldQuery.query !== query.query ? acc['updated'].concat(query) : acc['updated']
+        updated: !!oldQuery && isUpdate ? acc['updated'].concat(query) : acc['updated']
       };
     },
     { added: [], updated: [] }
   )
+}
+
+function areEqualQueries(query1: string, query2: string): boolean {
+  if (query1 == undefined || query2 == undefined) {
+    return false;
+  }
+
+  return print(parse(query1)) === print(parse(query2));
 }
 
 export function getAddedOrUpdatedQueries(
