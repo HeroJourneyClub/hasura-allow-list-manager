@@ -25,8 +25,8 @@ function addFragmentsToQuery(defNode: OperationDefinitionNode, fragments: Record
   return query
 }
 
-export function sourceToQueryCollection(prevQueryCollections: QueryCollection[], source: Source) {
-    // Gather any fragment if any
+export function getFragmentMap(sources: Source[]) {
+  return sources.reduce<Record<string, FragmentDefinitionNode>>((acc, source) => {
     const fragmentMap = source.document.definitions.reduce<Record<string, FragmentDefinitionNode>>(
       (acc, nodeDef: DefinitionNode) => {
         if (nodeDef.kind == 'FragmentDefinition') {
@@ -39,6 +39,11 @@ export function sourceToQueryCollection(prevQueryCollections: QueryCollection[],
       {}
     )
 
+    return { ...acc, ...fragmentMap };
+  }, {});
+}
+
+export function sourceToQueryCollection(prevQueryCollections: QueryCollection[], source: Source, fragmentMap: Record<string, FragmentDefinitionNode>) {
     return source.document.definitions.reduce<QueryCollection[]>(
       (acc, defNode: DefinitionNode) => {
         if (defNode.kind == 'OperationDefinition') {
@@ -68,8 +73,9 @@ export function sourceToQueryCollection(prevQueryCollections: QueryCollection[],
 
 
 export function createQueryCollections(sources: Source[]): QueryCollection[] {
+  const fragmentMap = getFragmentMap(sources);
   return sources.reduce<QueryCollection[]>((acc, source) => {
-    return sourceToQueryCollection(acc, source)
+    return sourceToQueryCollection(acc, source, fragmentMap)
   }, []);
 }
 
