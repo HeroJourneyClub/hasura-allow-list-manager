@@ -9,13 +9,19 @@ export interface QueryCollection {
 
 function addFragmentsToQuery(defNode: OperationDefinitionNode, fragments: Record<string, FragmentDefinitionNode>) {
   let query : string = print(defNode)
+  const fragmentNames = new Set<string>()
 
   function recursivelyFindFragments(defNode: OperationDefinitionNode| FragmentDefinitionNode) {
     visit(defNode, {
       FragmentSpread(node) {
+        if (fragmentNames.has(node.name.value)) {
+          return
+        }
+        
         const fragDef = fragments[node.name.value]
         // everytime we find a fragment, we add it to the query collection, and check the fragment for fragment
         query += `\n\n${print(fragDef)}`
+        fragmentNames.add(node.name.value)
         recursivelyFindFragments(fragDef);
       },
     })
