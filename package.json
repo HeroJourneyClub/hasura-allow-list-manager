@@ -1,6 +1,6 @@
 {
   "name": "@herojourneyclub/hasura-allow-list-manager",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Populate the Hasura allow-list from found GraphQL operations in your project",
   "main": "dist/index.js",
   "bin": {
@@ -27,7 +27,7 @@
     "Hero Journey Club <devs@herojourney.club>"
   ],
   "engines": {
-    "node": "^16"
+    "node": "^16 || ^18"
   },
   "license": "MPL-2.0",
   "bugs": {
