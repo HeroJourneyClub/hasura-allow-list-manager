@@ -51,6 +51,8 @@ hasura-allow-list-manager [options]
 - `-i | --allow-instrospection` Send the Introspection query with your queries
 - `-r | --reset` Delete all allow lists before running insert
 - `-v | --version <version>` Version queries instead of replacing them. Incompatible with -f
+- `--version-max-version` Maximum number of versions to keep per query. Will always keep at least 1
+- `--version-max-day` Maximum age (in days) of query versions to keep. Will always keep at least 1 
 
 
 ### Examples
@@ -66,6 +68,35 @@ GIT_VERSION=$(git log --pretty=format:"%h" -1)
 hasura-allow-list-manager -h http://localhost:8080 -s my-admin-secret -p './**/*.graphql' -v ${GIT_VERSION}
 ```
 
+
+`--version-max-version` and `--version-max-age` examples:
+
+All queries are stored in the format of `<query_name>__(<timestamp>-<version>)`. In the example the timestamp is a simple integer value.
+```json
+{
+    "GetProfile__(1_version-1)": "query GetProfile { Users { id } }",
+    "GetProfile__(2_version-2)": "query GetProfile { Users { id, firstName } }",
+    "GetProfile__(3_version-3)": "query GetProfile { Users { id, lastName } }"
+}
+```
+
+Running the allow list manager with `--version-max-version 2` would result in keeping the 2 most recent versions, so: 
+
+```json
+{
+    "GetProfile__(2_version-2)": "query GetProfile { Users { id, firstName } }",
+    "GetProfile__(3_version-3)": "query GetProfile { Users { id, lastName } }"
+}
+```
+
+Running the allow list manager with `--version-max-age 1` would keep all queries in the list that are 1 day old. If they are all older it would keep the most recent one.
+If we assume that todays timestamp is 4 then we would keep this: 
+
+```json
+{
+    "GetProfile__(3_version-3)": "query GetProfile { Users { id, lastName } }"
+}
+```
 
 ## Development
 
