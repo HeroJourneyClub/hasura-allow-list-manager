@@ -43,7 +43,7 @@
     "chalk": "^4.1.1",
     "commander": "^7.2.0",
     "diff": "^5.0.0",
-    "graphql": "^16.6.0"
+    "graphql": "^16.8.1"
   },
   "devDependencies": {
     "@types/diff": "^5.0.0",
