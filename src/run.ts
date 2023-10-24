@@ -106,11 +106,9 @@ export async function run(
     report.addedCount = addedQueries.length;
     report.updated = updatedQueries.length;
 
-    await Promise.all(
-      addedQueries.map(query => {
-        return api.addQueryToCollection(query);
-      })
-    );
+    for (const query of addedQueries) {
+      await api.addQueryToCollection(query);
+    }
 
     if (version) {
       await Promise.all(
