@@ -1,4 +1,3 @@
-import { QueryCollection } from './QueryCollection';
 import { Api } from './Api';
 
 export async function hasuraService(api: Api) {
@@ -15,12 +14,5 @@ export async function hasuraService(api: Api) {
     hasQueryCollections: !!allowQueryCollection,
     queryCollectionsPresentInAllowList: !!allowListCollection,
     remoteQueries: allowQueryCollection?.definition?.queries,
-
-    async replaceQueryFromCollection(
-      collectionQuery: QueryCollection
-    ): Promise<any> {
-      await api.dropQueryFromCollection(collectionQuery);
-      return api.addQueryToCollection(collectionQuery);
-    },
   };
 }
