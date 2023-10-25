@@ -8,6 +8,7 @@ const adminSecret = 'my-admin-secret';
 const hasuraUri = process.env.HASURA_URI || 'http://localhost:8090';
 const sourcePathOne = path.resolve(__dirname, 'operations/1/**/*.graphql');
 const sourcePathTwo = path.resolve(__dirname, 'operations/2/**/*.graphql');
+const queryCollectionPath = './query_collection.yaml';
 const composeOptions: IDockerComposeOptions = {
   cwd: path.join(__dirname),
   composeOptions: ['-p hasura-allow-operations-in'],
@@ -31,7 +32,7 @@ describe('e2e', () => {
     });
 
     it('finds GraphQL operations as SDL within .graphql files, and adds them to the Hasura allow list', async () => {
-      const report = await run(hasuraUri, adminSecret, sourcePathOne);
+      const report = await run(hasuraUri, adminSecret, sourcePathOne, queryCollectionPath);
       expect(report.existingCount).toBe(0);
       expect(report.addedCount).toBe(3);
       expect(report.collectionCreated).toBe(true);
@@ -39,7 +40,7 @@ describe('e2e', () => {
     });
 
     it('optionally includes the introspection query', async () => {
-      const report = await run(hasuraUri, adminSecret, sourcePathOne, true);
+      const report = await run(hasuraUri, adminSecret, sourcePathOne, queryCollectionPath, true);
       expect(report.existingCount).toBe(0);
       expect(report.addedCount).toBe(4);
       expect(report.collectionCreated).toBe(true);
@@ -54,12 +55,12 @@ describe('e2e', () => {
         commandOptions: ['--force-recreate'],
       });
       await delay(2000);
-      const report = await run(hasuraUri, adminSecret, sourcePathOne);
+      const report = await run(hasuraUri, adminSecret, sourcePathOne, queryCollectionPath);
       expect(report.addedCount).toBe(3);
     });
 
     it('finds GraphQL operations as SDL within .graphql files, and adds new items to the Hasura allow list', async () => {
-      const report = await run(hasuraUri, adminSecret, sourcePathOne);
+      const report = await run(hasuraUri, adminSecret, sourcePathOne, queryCollectionPath);
       expect(report.existingCount).toBe(3);
       expect(report.collectionCreated).toBe(false);
       expect(report.addedCount).toBe(0);
@@ -67,7 +68,7 @@ describe('e2e', () => {
     });
 
     it('allows new queries to be added from different source pointers', async () => {
-      const report = await run(hasuraUri, adminSecret, sourcePathTwo, true);
+      const report = await run(hasuraUri, adminSecret, sourcePathTwo, queryCollectionPath, true);
       expect(report.existingCount).toBe(3);
       expect(report.collectionCreated).toBe(false);
       expect(report.addedCount).toBe(2);
@@ -79,7 +80,7 @@ describe('e2e', () => {
     it('throws if the endpoint cannot be reached', async () => {
       expect.assertions(1);
       try {
-        await run(hasuraUri, adminSecret, sourcePathOne);
+        await run(hasuraUri, adminSecret, sourcePathOne, queryCollectionPath);
       } catch (error) {
         expect(error.code).toBe('ECONNREFUSED')
       }

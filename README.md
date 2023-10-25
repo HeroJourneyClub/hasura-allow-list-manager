@@ -53,6 +53,7 @@ hasura-allow-list-manager [options]
 - `-v | --version <version>` Version queries instead of replacing them. Incompatible with -f
 - `--version-max-version` Maximum number of versions to keep per query. Will always keep at least 1
 - `--version-max-day` Maximum age (in days) of query versions to keep. Will always keep at least 1 
+- `--query-collection-path` Path were the final query_collection will be stored
 
 
 ### Examples
