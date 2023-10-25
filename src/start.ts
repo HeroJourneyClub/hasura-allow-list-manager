@@ -13,6 +13,7 @@ const resetAllowList = !!options.reset
 const version = options.version
 const maxVersion = options.versionMaxVersion;
 const maxVersionDay = options.versionMaxDay;
+const queryCollectionPath = options.queryCollectionPath;
 
 if (sourcePath === undefined) {
   throw new Error('Source path must be passed as first argument');
@@ -22,7 +23,11 @@ if (hasuraUri === undefined) {
   throw new Error('Hasura URI must be passed as the second argument');
 }
 
-run(hasuraUri, adminSecret, sourcePath, allowIntrospection, resetAllowList, forceReplace, version, maxVersion, maxVersionDay)
+if (queryCollectionPath === undefined) {
+  throw new Error('Query collection path must be passed as the third argument');
+}
+
+run(hasuraUri, adminSecret, sourcePath, queryCollectionPath, allowIntrospection, resetAllowList, forceReplace, version, maxVersion, maxVersionDay)
   .then(
     ({
       operationDefinitionsFound,

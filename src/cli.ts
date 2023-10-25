@@ -14,7 +14,8 @@ program
   .option('-r, --reset', 'Delete all allow lists before running insert')
   .option('-v, --version <version>', 'Version queries instead of replacing them. Incompatible with -f')
   .option('--version-max-day <versionMaxDay>', 'Max day to keep versioned queries')
-  .option('--version-max-version <versionMaxVersion>', 'Max version to keep in versioned queries');
+  .option('--version-max-version <versionMaxVersion>', 'Max version to keep in versioned queries')
+  .option('--query-collection-path <queryCollectionPath>', 'Path to query collection file');
 
 export function getParams(args: string[]) {
   program.parse(args);
