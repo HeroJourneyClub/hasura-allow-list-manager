@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import { getIntrospectionQuery, OperationDefinitionNode } from 'graphql';
 import { loadDocuments } from '@graphql-tools/load';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
@@ -7,13 +6,13 @@ import {
   hasuraService,
   createQueryCollections,
   getOperationDefinitionNodes,
-  QueryCollection,
   getAddedOrUpdatedQueries,
-  addVersionToQueryName,
 } from './hasura';
 import { question } from './question';
 import { printQueryDiff } from './diff';
 import { QueryFilter } from './queryFilter';
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 
 export type RunReport = {
   addedCount: number;
@@ -24,22 +23,11 @@ export type RunReport = {
   removedQueries: number;
 };
 
-function throwIfUnexpected(error: AxiosError, acceptable_errors: string[]): void {
-  if (
-    error.response === undefined || !acceptable_errors.includes(error.response.data.code)
-  ) {
-    if (error.response?.data?.error) {
-      throw Error(error.response?.data?.error)
-    } else {
-      throw error;
-    }
-  }
-}
-
 export async function run(
   hasuraUri: string,
   adminSecret: string,
   sourcePaths: string | string[],
+  queryCollectionPath: string,
   allowIntrospection?: boolean,
   resetAllowList?: boolean,
   forceReplace?: boolean,
@@ -48,18 +36,31 @@ export async function run(
   maxVersionDay?: number,
 ): Promise<RunReport> {
   const api = init(hasuraUri, adminSecret);
+  const service = await hasuraService(api);
 
   const sources = await loadDocuments(sourcePaths, {
     loaders: [new GraphQLFileLoader()],
   });
 
-  let queryCollections = createQueryCollections(sources);
+  // List of queries used in the source code
+  let sourceQueryCollections = createQueryCollections(sources);
+  // List of queries already set in Hasura. If `resetAllowList` is true we'll use an empty array which will remove
+  // all queries when applied (unless found in `sourceQueryCollections`)
+  const serviceQueryCollections = resetAllowList ? [] : service.remoteQueries ?? [];
+  // The final query collection to be set in Hasura
+  const queryCollections = {
+    name: 'allowed-queries',
+    definition: {
+      queries: [...serviceQueryCollections],
+    },
+  };
 
-  if (allowIntrospection)
-    queryCollections.push({
+  if (allowIntrospection) {
+    sourceQueryCollections.push({
       name: 'IntrospectionQuery',
       query: getIntrospectionQuery(),
     });
+  }
 
   const report: RunReport = {
     addedCount: 0,
@@ -70,86 +71,48 @@ export async function run(
     removedQueries: 0,
   };
 
-  if (resetAllowList) {
-    try {
-      await api.dropQueryCollection()
-    } catch (error) {
-      throwIfUnexpected(error, ['not-exists'])
-    }
+  const { added: addedQueries, updated: updatedQueries } =
+    getAddedOrUpdatedQueries(
+      serviceQueryCollections,
+      sourceQueryCollections,
+      version
+  );
+
+  report.existingCount = serviceQueryCollections.length;
+  report.addedCount = addedQueries.length;
+  report.updated = updatedQueries.length;
+
+  if (addedQueries.length > 0) {
+    queryCollections.definition.queries.push(...addedQueries);
   }
 
-  const service = await hasuraService(api);
-
-  if (!service.hasQueryCollections) {
-    if (version) {
-      queryCollections = queryCollections.map<QueryCollection>(q => {
-        return {
-          name: addVersionToQueryName(q.name, version),
-          query: q.query,
-        };
+  if (version && updatedQueries.length > 0) {
+    queryCollections.definition.queries.push(...updatedQueries);
+  } else {
+    printQueryDiff(serviceQueryCollections, updatedQueries);
+    
+    const replaceQueries = () => {
+      const queryNamesToUpdate = updatedQueries.map((query) => query.name);
+      queryCollections.definition.queries.filter((query) => !queryNamesToUpdate.includes(query.name));
+      queryCollections.definition.queries.push(...updatedQueries);
+    };
+    
+    if (forceReplace) {
+      replaceQueries();
+    } else if (updatedQueries.length > 0) {
+      await question(
+        'Do you want to continue? This will replace the changed queries on Hasura! y/n -> '
+      ).then(answer => {
+        if (answer.toLowerCase().trim() === 'y') {
+          replaceQueries();
+        } else {
+          report.updated = 0;
+        }
       });
     }
-
-    await api.createQueryCollection(queryCollections);
-    report.collectionCreated = true;
-    report.addedCount = queryCollections.length;
-  } else {
-    // The main query collection ('allowed-queries') already exist. Must upddate it with new or updated queries
-    const { added: addedQueries, updated: updatedQueries } =
-      getAddedOrUpdatedQueries(
-        service.remoteQueries,
-        queryCollections,
-        version
-      );
-
-    report.existingCount = service.remoteQueries.length;
-    report.addedCount = addedQueries.length;
-    report.updated = updatedQueries.length;
-
-    for (const query of addedQueries) {
-      await api.addQueryToCollection(query);
-    }
-
-    if (version) {
-      await Promise.all(
-        updatedQueries.map(query => {
-          return api.addQueryToCollection(query);
-        })
-      )
-    } else {
-      printQueryDiff(service.remoteQueries, updatedQueries);
-
-      const replaceQueries = (queries: QueryCollection[]) => {
-        Promise.all(queries.map(service.replaceQueryFromCollection))
-          .then(() => {
-            console.log('Queries updated!');
-            process.exit(0);
-          })
-          .catch(e => {
-            console.log('Error on update queries!', e);
-            process.exit(1);
-          });
-      };
-
-      if (forceReplace) {
-        console.log('Forcing queries replacement...');
-        replaceQueries(updatedQueries);
-      } else if (updatedQueries.length > 0) {
-        await question(
-          'Do you want to continue? This will replace the changed queries on Hasura! y/n -> '
-        ).then(answer => {
-          if (answer.toLowerCase().trim() === 'y') {
-            replaceQueries(updatedQueries);
-          } else {
-            report.updated = 0;
-          }
-        });
-      }
-    }
   }
 
-  const metadata = await api.exportMetadata();
-  const queries: Array<any> = metadata.data?.query_collections?.[0]?.definition?.queries;
+  const queries = queryCollections.definition.queries;
 
   if (queries != undefined && (maxVersion != undefined || maxVersionDay != undefined)) {
     const queryNameRegex = /([a-zA-Z]+)([_]+)\(([\d]+)\-([a-z0-9-]+)\)/;
@@ -167,14 +130,16 @@ export async function run(
     }
 
     const queriesToDelete = queryFilter.getQueriesToDelete();
-    await Promise.all(queriesToDelete.map(api.dropQueryFromCollection));
+    const queryNamesToDelete = queriesToDelete.map((query) => query.name);
+    queryCollections.definition.queries = queryCollections.definition.queries.filter((query) => !queryNamesToDelete.includes(query.name));
 
     report.removedQueries = queriesToDelete.length;
   }
 
-  if (!service.queryCollectionsPresentInAllowList) {
-    await api.addCollectionToAllowList()
-  }
+  fs.writeFileSync(
+    queryCollectionPath,
+    yaml.dump([queryCollections]),
+  );
 
-  return report
+  return report;
 }
