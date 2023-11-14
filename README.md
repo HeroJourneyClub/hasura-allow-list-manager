@@ -15,7 +15,7 @@ Allow list is a important security feature that restrict the GraphQL engine so t
 ## How it works
 
 The local queries, mutations, and subscriptions defined in `.graphql` or `.gql` files will be compared with the remote Hasura server.
-The new definitions will be sent to Hasura and the existing ones will be compared and the difference between them will be shown. The replacement will be done by removing the remote query and replacing it with the local query.
+The allow list manager will fetch all allowed queries from the remote Hasura instance, add new queries, update existing ones and store the final query_collection files locally. Make sure to apply the new metadata to hasura after the allow list manager ran.
 
 ### Versioning behavior
 
@@ -40,6 +40,7 @@ yarn add --dev @herojourneyclub/hasura-allow-list-manager
 
 ```bash
 hasura-allow-list-manager [options]
+hasura apply-metadata
 ```
 
 ### Options
