@@ -27,7 +27,7 @@
     "Hero Journey Club <devs@herojourney.club>"
   ],
   "engines": {
-    "node": "^16 || ^18"
+    "node": "^18 || ^22"
   },
   "license": "MPL-2.0",
   "bugs": {
